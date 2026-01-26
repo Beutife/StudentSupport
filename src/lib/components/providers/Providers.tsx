@@ -47,8 +47,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
             authProviders: [
               AuthProvider.EMAIL_OTP,
               AuthProvider.GOOGLE,
-              AuthProvider.PHONE,
-              AuthProvider.EMAIL_PASSWORD
             ],
             // How users recover wallets
             walletRecovery: {
