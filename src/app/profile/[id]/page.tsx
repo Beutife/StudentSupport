@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useOpenfort } from '@openfort/react';
+import { useAccount } from 'wagmi'; 
 
 interface Profile {
   id: string;
@@ -18,7 +19,8 @@ export default function ProfilePage() {
   const params = useParams();
   const profileId = params.id as string;
   const { user } = useOpenfort();
-
+  const { address: sponsorWallet } = useAccount();
+  
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [subscribing, setSubscribing] = useState(false);
@@ -44,18 +46,56 @@ export default function ProfilePage() {
   }, [profileId]);
 
   // Handle subscription (we'll implement this later with session keys)
-  const handleSubscribe = async (amount: number) => {
+// Replace the existing handleSubscribe function with this:
+const handleSubscribe = async (amount: number) => {
     if (!user) {
-      alert('Please login first');
+      alert('Please login first to sponsor this student');
       return;
     }
-
+  
+    // Get sponsor's wallet address
+    const { address: sponsorWallet } = useAccount();
+    
+    if (!sponsorWallet) {
+      alert('Wallet not ready. Please wait a moment and try again.');
+      return;
+    }
+  
     setSubscribing(true);
+    
     try {
-      // TODO: Implement subscription with session keys
-      alert(`Subscribe ₦${amount}/month - Coming soon!`);
-    } catch (error) {
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sponsor_email: user.email,
+          sponsor_wallet: sponsorWallet,
+          student_profile_id: profileId,
+          amount: amount,
+          months: 3, // Fixed 3 months for now
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(data.error || 'Subscription failed');
+      }
+  
+      // Show success message
+      alert(`
+        🎉 Subscription Successful!
+        
+        You're now sponsoring ${profile?.name} with ₦${amount.toLocaleString()}/month for 3 months.
+        
+        Total: ₦${(amount * 3).toLocaleString()}
+        
+        Payments will happen automatically each month - no popups!
+      `);
+  
+    } catch (error: any) {
       console.error('Subscription error:', error);
+      alert(`Error: ${error.message}`);
     } finally {
       setSubscribing(false);
     }

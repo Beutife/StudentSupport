@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useOpenfort } from '@openfort/react';
 import { useRouter } from 'next/navigation';
 import { useAccount } from 'wagmi';
+import { LogoutButton } from '../../lib/components/providers/LogoutButton';
 
 export default function CreateProfile() {
   const { user } = useOpenfort();
@@ -20,6 +21,56 @@ export default function CreateProfile() {
     story: '',
     monthly_need: '',
   });
+
+  const VALID_STUDENT_DOMAINS = [
+    '@student.oauife.edu.ng',
+    '@oauife.edu.ng',
+    '@unilag.edu.ng',
+    '@student.unilag.edu.ng',
+    '@ui.edu.ng',
+    '@student.ui.edu.ng',
+    '@student.futa.edu.ng',
+    '@futa.edu.ng',
+  ];
+
+//   function isValidStudentDomain(email: string): boolean {
+//     return VALID_STUDENT_DOMAINS.some(domain => 
+//         email.toLowerCase().endsWith(domain)
+//     );
+//   }
+
+// Add this NEW useEffect to check if profile exists
+useEffect(() => {
+    async function checkExistingProfile() {
+      if (!user || !walletAddress) return;
+  
+      try {
+        // Get email from user object (try multiple possible properties)
+        const email = user?.email || user?.emailVerified || (user as any)?.emailAddress;
+        if (!email) return;
+        
+        // Check if user already has a profile
+        const userResponse = await fetch(`/api/user?email=${encodeURIComponent(email)}`);
+        const { user: dbUser } = await userResponse.json();
+        
+        if (dbUser) {
+          // Check if this user has a profile
+          const profileResponse = await fetch(`/api/profile?userId=${dbUser.id}`);
+          const { profile } = await profileResponse.json();
+          
+          if (profile) {
+            // Profile exists! Redirect to it
+            router.push(`/profile/${profile.id}`);
+          }
+        }
+      } catch (error) {
+        console.error('Error checking profile:', error);
+      }
+    }
+  
+    checkExistingProfile();
+  }, [user, walletAddress, router]);
+
 
   // Redirect if not logged in
   useEffect(() => {
@@ -42,10 +93,23 @@ export default function CreateProfile() {
     setLoading(true);
     setError('');
 
+    //Verify student email
+    // if (!isValidStudentDomain(user?.emailVerified as unknown as string)) {
+    // setError('Please use your university student email (e.g., name@student.oauife.edu.ng)');
+    // return;
+    // }
+
+
     try {
       // Check if wallet is connected
       if (!walletAddress) {
         throw new Error('Wallet not connected. Please ensure you are logged in.');
+      }
+
+      // Get email from user object (try multiple possible properties)
+      const email = user?.email || user?.emailVerified || (user as any)?.emailAddress;
+      if (!email) {
+        throw new Error('Email not found. Please ensure you are logged in.');
       }
 
       // Create or get user in database
@@ -53,7 +117,7 @@ export default function CreateProfile() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: user?.emailVerified,
+          email: email,
           wallet_address: walletAddress,
         }),
       });
@@ -75,6 +139,20 @@ export default function CreateProfile() {
 
       if (!profileResponse.ok) {
         const errorData = await profileResponse.json();
+        
+        // If profile already exists, fetch it and redirect
+        if (profileResponse.status === 409 && errorData.error === 'Profile already exists') {
+          // Fetch the existing profile
+          const existingProfileResponse = await fetch(`/api/profile?userId=${dbUser.id}`);
+          const { profile: existingProfile } = await existingProfileResponse.json();
+          
+          if (existingProfile) {
+            // Redirect to existing profile
+            router.push(`/profile/${existingProfile.id}`);
+            return;
+          }
+        }
+        
         throw new Error(errorData.error || 'Failed to create profile');
       }
 
@@ -97,6 +175,11 @@ export default function CreateProfile() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12 px-4">
       <div className="max-w-2xl mx-auto">
+
+      <div className="flex justify-end mb-4">
+        <LogoutButton />
+      </div>
+
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-blue-600 mb-2">
@@ -107,6 +190,17 @@ export default function CreateProfile() {
           </p>
         </div>
 
+         
+        {/* <div className="mb-6 p-4 bg-blue-50 border-2 border-blue-200 rounded-lg">
+        <p className="text-sm text-blue-800">
+            📧 Logged in as: <strong>{user.email}</strong>
+        </p>
+        {!isValidStudentDomain(user.email as unknown as string) && (
+            <p className="text-sm text-red-600 mt-2">
+            <strong>This doesn't look like a student email. Please logout and sign in with your university email.</strong>
+            </p>
+        )}
+        </div> */}
         {/* Form */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <form onSubmit={handleSubmit} className="space-y-6">

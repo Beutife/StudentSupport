@@ -9,12 +9,62 @@ export default function Home() {
   const { user } = useOpenfort();  // Get current user
   const router = useRouter();
   
+  const handleViewProfile = async () => {
+    if (!user) return;
+  
+    try {
+      // Get user from database
+      const userResponse = await fetch(`/api/user?email=${user.email}`);
+      const { user: dbUser } = await userResponse.json();
+      
+      if (dbUser) {
+        // Get profile
+        const profileResponse = await fetch(`/api/profile?userId=${dbUser.id}`);
+        const { profile } = await profileResponse.json();
+        
+        if (profile) {
+          router.push(`/profile/${profile.id}`);
+        } else {
+          router.push('/create-profile');
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
   // If user logged in, redirect to create profile
   useEffect(() => {
-    if (user) {
-      router.push('/create-profile');
+    async function checkUser() {
+      if (user) {
+        // Check if user has profile
+        try {
+          const userResponse = await fetch(`/api/user?email=${user.email}`);
+          const { user: dbUser } = await userResponse.json();
+          
+          if (dbUser) {
+            const profileResponse = await fetch(`/api/profile?userId=${dbUser.id}`);
+            const { profile } = await profileResponse.json();
+            
+            if (profile) {
+              // Has profile - show it
+              router.push(`/profile/${profile.id}`);
+            } else {
+              // No profile - create one
+              router.push('/create-profile');
+            }
+          } else {
+            // New user - create profile
+            router.push('/create-profile');
+          }
+        } catch (error) {
+          console.error('Error checking user:', error);
+        }
+      }
     }
+  
+    checkUser();
   }, [user, router]);
+  
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-8 bg-gradient-to-b from-blue-50 to-white">
