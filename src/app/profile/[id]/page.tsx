@@ -19,8 +19,8 @@ export default function ProfilePage() {
   const params = useParams();
   const profileId = params.id as string;
   const { user } = useOpenfort();
-  const { address: sponsorWallet } = useAccount();
-  
+  const { address } = useAccount();
+
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [subscribing, setSubscribing] = useState(false);
@@ -46,17 +46,13 @@ export default function ProfilePage() {
   }, [profileId]);
 
   // Handle subscription (we'll implement this later with session keys)
-// Replace the existing handleSubscribe function with this:
-const handleSubscribe = async (amount: number) => {
+  const handleSubscribe = async (amount: number) => {
     if (!user) {
       alert('Please login first to sponsor this student');
       return;
     }
   
-    // Get sponsor's wallet address
-    const { address: sponsorWallet } = useAccount();
-    
-    if (!sponsorWallet) {
+    if (!address) {
       alert('Wallet not ready. Please wait a moment and try again.');
       return;
     }
@@ -68,8 +64,8 @@ const handleSubscribe = async (amount: number) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          sponsor_email: user.email,
-          sponsor_wallet: sponsorWallet,
+          sponsor_email: user.email || user.emailVerified || (user as any)?.emailAddress,
+          sponsor_wallet: address,
           student_profile_id: profileId,
           amount: amount,
           months: 3, // Fixed 3 months for now

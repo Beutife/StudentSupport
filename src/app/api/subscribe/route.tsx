@@ -59,15 +59,17 @@ export async function POST(request: NextRequest) {
     const nextChargeDate = new Date(now);
     nextChargeDate.setMonth(nextChargeDate.getMonth() + 1);
 
-    // Create session key with Openfort
-    const sessionKeyResponse = await openfort.accounts.createSessionKey({
-      id: sponsor_wallet, // sponsor's wallet address
-      chainId: 84532, // Base Sepolia
-      address: sponsor_wallet,
-      validUntil: Math.floor(validUntil.getTime() / 1000),
-      validAfter: Math.floor(now.getTime() / 1000),
-      policy: process.env.OPENFORT_GAS_POLICY_ID!,
-    });
+    /**
+     * NOTE:
+     * `@openfort/openfort-node@0.7.4` does NOT have `openfort.accounts.createSessionKey`.
+     * Session keys are created via the Sessions API (`createSession`) and require a *session key address*
+     * (a fresh keypair), not the sponsor's wallet address.
+     *
+     * For now we skip session-key creation so subscriptions can be created without 500'ing.
+     * TODO: Implement proper session key generation + `openfort.sessions.create(...)` (or equivalent)
+     * once the session-key flow is designed end-to-end.
+     */
+    void openfort; // keep import used until session keys are implemented
 
     // Save subscription to database
     const { data: subscription, error } = await supabaseAdmin
@@ -78,7 +80,7 @@ export async function POST(request: NextRequest) {
         amount: amount,
         months: months,
         current_month: 1,
-        session_key_address: sessionKeyResponse.address,
+        session_key_address: null,
         status: 'active',
         next_charge_date: nextChargeDate.toISOString().split('T')[0],
       })
