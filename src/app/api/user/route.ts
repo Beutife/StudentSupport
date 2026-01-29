@@ -1,20 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../lib/superbase';
-// GET user by email
+// GET user by email or userId
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const email = searchParams.get('email');
+    const userId = searchParams.get('userId');
 
-    if (!email) {
-      return NextResponse.json({ error: 'Email required' }, { status: 400 });
+    if (!email && !userId) {
+      return NextResponse.json({ error: 'Email or userId required' }, { status: 400 });
     }
 
-    const { data: user, error } = await supabaseAdmin
-      .from('users')
-      .select('*')
-      .eq('email', email)
-      .single();
+    let query = supabaseAdmin.from('users').select('*');
+    
+    if (email) {
+      query = query.eq('email', email);
+    } else if (userId) {
+      query = query.eq('id', userId);
+    }
+
+    const { data: user, error } = await query.single();
 
     if (error || !user) {
       return NextResponse.json({ user: null }, { status: 404 });

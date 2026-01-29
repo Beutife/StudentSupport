@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useOpenfort } from '@openfort/react';
 import { useAccount } from 'wagmi'; 
+import { useRouter } from 'next/navigation';
 
 interface Profile {
   id: string;
@@ -20,10 +21,21 @@ export default function ProfilePage() {
   const profileId = params.id as string;
   const { user } = useOpenfort();
   const { address } = useAccount();
-
+  const router = useRouter();   
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [subscribing, setSubscribing] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+
+  const handleShareProfile = () => { 
+    const profileUrl = `${window.location.origin}/profile/${profileId}`;
+    navigator.clipboard.writeText(profileUrl);
+    setCopied(true);
+    setTimeout(() => {
+      setCopied(false);
+    }, 2000);
+  }
 
   // Fetch profile data
   useEffect(() => {
@@ -60,27 +72,65 @@ export default function ProfilePage() {
     setSubscribing(true);
     
     try {
+      // Get student's wallet address via API
+      const studentWalletResponse = await fetch(`/api/profile?profileId=${profileId}`);
+      const studentData = await studentWalletResponse.json();
+      
+      if (!studentData.profile) {
+        throw new Error('Student profile not found');
+      }
+
+      // Get student's user record to get wallet address
+      const userResponse = await fetch(`/api/user?userId=${studentData.profile.user_id}`);
+      const userData = await userResponse.json();
+      
+      if (!userData.user?.wallet_address) {
+        throw new Error('Student wallet not found');
+      }
+
       const response = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sponsor_email: user.email || user.emailVerified || (user as any)?.emailAddress,
-          sponsor_wallet: address,
+          sponsor_player_id: user.id,
           student_profile_id: profileId,
+          student_wallet: userData.user.wallet_address,
           amount: amount,
           months: 3, // Fixed 3 months for now
         }),
       });
   
-      const data = await response.json();
+      // Check if response has content before parsing JSON
+      const contentType = response.headers.get('content-type');
+      let data;
+      
+      if (contentType && contentType.includes('application/json')) {
+        const text = await response.text();
+        if (text) {
+          try {
+            data = JSON.parse(text);
+          } catch (parseError) {
+            throw new Error('Invalid response from server');
+          }
+        } else {
+          throw new Error('Empty response from server');
+        }
+      } else {
+        throw new Error('Unexpected response format from server');
+      }
   
       if (!response.ok) {
-        throw new Error(data.error || 'Subscription failed');
+        // Handle error - could be string or object
+        const errorMessage = typeof data?.error === 'string' 
+          ? data.error 
+          : data?.error?.message || JSON.stringify(data?.error) || 'Subscription failed';
+        throw new Error(errorMessage);
       }
   
       // Show success message
       alert(`
-        🎉 Subscription Successful!
+         Subscription Successful!
         
         You're now sponsoring ${profile?.name} with ₦${amount.toLocaleString()}/month for 3 months.
         
@@ -89,6 +139,8 @@ export default function ProfilePage() {
         Payments will happen automatically each month - no popups!
       `);
   
+      // Redirect to sponsor dashboard
+    router.push(`/dashboard`);
     } catch (error: any) {
       console.error('Subscription error:', error);
       alert(`Error: ${error.message}`);
@@ -167,6 +219,50 @@ export default function ProfilePage() {
               </p>
             </div>
 
+            {/* Share Profile */}
+
+    <div className="mb-8 p-6 bg-green-50 rounded-xl border-2 border-green-200">
+      <h3 className="font-bold text-green-900 mb-3">📤 Share Your Profile</h3>
+      <p className="text-sm text-green-800 mb-4">
+        Share this link with potential sponsors (alumni, family, friends)
+      </p>
+      
+      <div className="flex gap-3">
+        <input
+          type="text"
+          value={`${typeof window !== 'undefined' ? window.location.origin : ''}/profile/${profileId}`}
+          readOnly
+          className="flex-1 px-4 py-3 bg-white border-2 border-green-300 rounded-lg text-sm"
+        />
+        <button
+          onClick={handleShareProfile}
+          className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors"
+        >
+          {copied ? '✓ Copied!' : 'Copy Link'}
+        </button>
+      </div>
+
+      <div className="mt-4 flex gap-3">
+        <a
+          href={`https://twitter.com/intent/tweet?text=Help me stay in school! ${window.location.href}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-lg"
+        >
+          Share on Twitter
+        </a>
+         <a 
+          href={`https://wa.me/?text=Help me stay in school! ${window.location.href}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg"
+        >
+          Share on WhatsApp
+        </a>
+      </div>
+    </div>
+  
+
             {/* Sponsor Buttons */}
             <div className="border-t-2 border-gray-100 pt-8">
               <h3 className="text-lg font-bold text-gray-800 mb-4">
@@ -219,10 +315,10 @@ export default function ProfilePage() {
         <div className="mt-8 p-6 bg-white rounded-xl shadow-lg border-2 border-gray-100">
           <h3 className="font-bold text-gray-800 mb-3">🔒 How it works:</h3>
           <div className="space-y-2 text-sm text-gray-600">
-            <p>✓ Subscribe once, auto-charged monthly (no popups!)</p>
-            <p>✓ Money goes directly to student's wallet</p>
-            <p>✓ Cancel anytime from your dashboard</p>
-            <p>✓ Powered by Openfort session keys (gasless!)</p>
+            <p> Subscribe once, auto-charged monthly (no popups!)</p>
+            <p> Money goes directly to student's wallet</p>
+            <p> Cancel anytime from your dashboard</p>
+            <p> Powered by Openfort session keys (gasless!)</p>
           </div>
         </div>
       </div>

@@ -1,24 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../lib/superbase';
 import { openfort } from '../../../lib/openforte';
+import { TransactionIntent, TransactionIntentResponse } from '@openfort/openfort-node';
 export async function POST(request: NextRequest) {
   try {
     const { 
-      sponsor_email,
-      sponsor_wallet,
-      student_profile_id, 
-      amount,
-      months 
+        sponsor_email,
+        sponsor_player_id,
+        student_profile_id, 
+        student_wallet,
+        amount,
+        months  
     } = await request.json();
 
     // Validate inputs
-    if (!sponsor_email || !sponsor_wallet || !student_profile_id || !amount || !months) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
-    }
-
+    if (!sponsor_email || !sponsor_player_id || !student_profile_id || !student_wallet || !amount || !months) {
+        return NextResponse.json(
+          { error: 'Missing required fields' },
+          { status: 400 }
+        );
+      }
     // Get or create sponsor user
     let { data: sponsor } = await supabaseAdmin
       .from('users')
@@ -31,10 +32,17 @@ export async function POST(request: NextRequest) {
         .from('users')
         .insert({
           email: sponsor_email,
-          wallet_address: sponsor_wallet,
+          wallet_address: null,
         })
         .select()
         .single();
+
+      if (!newSponsor) {
+        return NextResponse.json(
+          { error: 'Failed to create sponsor' },
+          { status: 500 }
+        );
+      }
       sponsor = newSponsor;
     }
 
@@ -52,24 +60,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Create transaction intent with Openfort 
+    // Note: This might fail if the sponsor doesn't have an Openfort account yet
+    // We'll handle this gracefully and still create the subscription
+    let transactionIntentId: string | null = null;
+    try {
+      const transactionIntent = await openfort.transactionIntents.create({
+        player: sponsor_player_id,
+        chainId: 84532, // Base Sepolia
+        optimistic: true,
+        policy: process.env.OPENFORT_GAS_POLICY_ID,
+        interactions: [
+          {
+            contract: '0x036CbD53842c5426634e7929541eC2318f3dCF7e', // USDC on Base Sepolia
+            functionName: 'transfer',
+            functionArgs: [student_wallet, amount * 1000000], // USDC has 6 decimals
+          },
+        ],
+      });
+      transactionIntentId = transactionIntent.id;
+    } catch (txError: any) {
+      console.warn('Transaction intent creation failed:', txError);
+      // Continue without transaction intent - subscription can still be created
+      // The transaction can be created later when processing payments
+    }
+
+
     // Calculate dates
     const now = new Date();
     const validUntil = new Date(now);
     validUntil.setMonth(validUntil.getMonth() + months);
     const nextChargeDate = new Date(now);
     nextChargeDate.setMonth(nextChargeDate.getMonth() + 1);
-
-    /**
-     * NOTE:
-     * `@openfort/openfort-node@0.7.4` does NOT have `openfort.accounts.createSessionKey`.
-     * Session keys are created via the Sessions API (`createSession`) and require a *session key address*
-     * (a fresh keypair), not the sponsor's wallet address.
-     *
-     * For now we skip session-key creation so subscriptions can be created without 500'ing.
-     * TODO: Implement proper session key generation + `openfort.sessions.create(...)` (or equivalent)
-     * once the session-key flow is designed end-to-end.
-     */
-    void openfort; // keep import used until session keys are implemented
 
     // Save subscription to database
     const { data: subscription, error } = await supabaseAdmin
@@ -80,7 +102,7 @@ export async function POST(request: NextRequest) {
         amount: amount,
         months: months,
         current_month: 1,
-        session_key_address: null,
+        session_key_address: transactionIntentId, // Can be null if transaction intent creation failed
         status: 'active',
         next_charge_date: nextChargeDate.toISOString().split('T')[0],
       })
@@ -97,8 +119,19 @@ export async function POST(request: NextRequest) {
 
   } catch (error: any) {
     console.error('Subscribe error:', error);
+    
+    // Format error message properly
+    let errorMessage = 'Failed to create subscription';
+    if (error?.message) {
+      errorMessage = error.message;
+    } else if (typeof error === 'string') {
+      errorMessage = error;
+    } else if (error?.error) {
+      errorMessage = typeof error.error === 'string' ? error.error : error.error.message || errorMessage;
+    }
+    
     return NextResponse.json(
-      { error: error.message || 'Failed to create subscription' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

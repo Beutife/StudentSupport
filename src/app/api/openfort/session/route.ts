@@ -2,7 +2,7 @@
 // https://www.openfort.io/docs/products/embedded-wallet/react
 
 import { NextResponse } from 'next/server';
-import { openfort } from '../../../../lib/openforte';
+import { openfort } from '@/src/lib/openforte';
 
 export async function POST() {
   try {
