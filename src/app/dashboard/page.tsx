@@ -93,24 +93,24 @@ export default function Dashboard() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12 px-4">
+    <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-8 sm:py-12 px-4">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold text-blue-600 mb-8">
+        <h1 className="text-3xl sm:text-4xl font-bold text-blue-600 mb-6 sm:mb-8">
           Your Impact Dashboard
         </h1>
 
         {subscriptions.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-            <div className="text-6xl mb-4">📚</div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+          <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-12 text-center">
+            <div className="text-5xl sm:text-6xl mb-4">📚</div>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">
               No Active Subscriptions
             </h2>
-            <p className="text-gray-600 mb-8">
+            <p className="text-gray-600 mb-6 sm:mb-8">
               Start supporting a student today!
             </p>
             <Link
-              href="/students"
-              className="inline-block px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors"
+              href="/"
+              className="inline-block px-6 sm:px-8 py-3 sm:py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors text-sm sm:text-base"
             >
               Browse Students
             </Link>
@@ -120,64 +120,65 @@ export default function Dashboard() {
             {subscriptions.map((sub) => (
               <div
                 key={sub.id}
-                className="bg-white rounded-xl shadow-lg p-6 border-2 border-blue-100"
+                className="bg-white rounded-xl shadow-lg p-4 sm:p-6 border-2 border-blue-100"
               >
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-800">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-start mb-4 gap-3">
+                  <div className="flex-1">
+                    <h3 className="text-lg sm:text-xl font-bold text-gray-800">
                       {sub.student.name}
                     </h3>
-                    <p className="text-gray-600">{sub.student.school}</p>
+                    <p className="text-sm sm:text-base text-gray-600">{sub.student.school}</p>
                   </div>
-                  <span className="px-4 py-2 bg-green-100 text-green-800 font-semibold rounded-full text-sm">
+                  <span className="px-3 sm:px-4 py-1 sm:py-2 bg-green-100 text-green-800 font-semibold rounded-full text-xs sm:text-sm whitespace-nowrap">
                     Active
                   </span>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4 mb-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                   <div>
-                    <p className="text-sm text-gray-500">Monthly Amount</p>
-                    <p className="text-2xl font-bold text-blue-600">
+                    <p className="text-xs sm:text-sm text-gray-500">Monthly Amount</p>
+                    <p className="text-xl sm:text-2xl font-bold text-blue-600">
                       ₦{sub.amount.toLocaleString()}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Progress</p>
-                    <p className="text-2xl font-bold text-gray-800">
+                    <p className="text-xs sm:text-sm text-gray-500">Progress</p>
+                    <p className="text-xl sm:text-2xl font-bold text-gray-800">
                       {sub.current_month}/{sub.months} months
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Total Given</p>
-                    <p className="text-2xl font-bold text-gray-800">
+                    <p className="text-xs sm:text-sm text-gray-500">Total Given</p>
+                    <p className="text-xl sm:text-2xl font-bold text-gray-800">
                       ₦{(sub.amount * sub.current_month).toLocaleString()}
                     </p>
                   </div>
                 </div>
 
                 <div className="pt-4 border-t border-gray-200">
-                  <p className="text-sm text-gray-600">
-                    Next payment: {new Date(sub.next_charge_date).toLocaleDateString()}
-                  </p>
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <p className="text-sm text-gray-600">
+                      Next payment: {new Date(sub.next_charge_date).toLocaleDateString()}
+                    </p>
+                    <button
+                      onClick={() => handleCancel(sub.id)}
+                      className="w-full sm:w-auto px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-semibold transition-colors"
+                    >
+                      Cancel Subscription
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
 
-            <div className="bg-blue-50 rounded-xl p-6 border-2 border-blue-200">
-              <h3 className="font-bold text-blue-900 mb-2">📊 Total Impact</h3>
-              <p className="text-3xl font-bold text-blue-600">
+            <div className="bg-blue-50 rounded-xl p-4 sm:p-6 border-2 border-blue-200">
+              <h3 className="font-bold text-blue-900 mb-2 text-base sm:text-lg">📊 Total Impact</h3>
+              <p className="text-2xl sm:text-3xl font-bold text-blue-600">
                 ₦{subscriptions.reduce((sum, sub) => sum + (sub.amount * sub.current_month), 0).toLocaleString()}
               </p>
-              <p className="text-sm text-blue-800 mt-1">
+              <p className="text-xs sm:text-sm text-blue-800 mt-1">
                 given to {subscriptions.length} student{subscriptions.length !== 1 ? 's' : ''}
               </p>
-                <button
-                onClick={() => handleCancel(sub.id)}
-                className="mt-4 w-full px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-semibold transition-colors"
-                >
-                Cancel Subscription
-                </button>
-
             </div>
           </div>
         )}

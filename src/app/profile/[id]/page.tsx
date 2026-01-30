@@ -178,82 +178,81 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12 px-4">
+    <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-6 sm:py-12 px-4">
       <div className="max-w-3xl mx-auto">
         {/* Profile Card */}
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           {/* Header with Avatar */}
-          <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-8 text-white">
-            <div className="flex items-center gap-6">
+          <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4 sm:p-8 text-white">
+            <div className="flex flex-col sm:flex-row items-center sm:items-center gap-4 sm:gap-6">
               {/* Avatar */}
-              <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center text-4xl">
+              <div className="w-16 h-16 sm:w-24 sm:h-24 bg-white rounded-full flex items-center justify-center text-3xl sm:text-4xl">
                 🎓
               </div>
               
               {/* Name & School */}
-              <div>
-                <h1 className="text-3xl font-bold mb-2">{profile.name}</h1>
+              <div className="text-center sm:text-left">
+                <h1 className="text-2xl sm:text-3xl font-bold mb-2">{profile.name}</h1>
                 {profile.school && (
-                  <p className="text-blue-100 text-lg">{profile.school}</p>
+                  <p className="text-blue-100 text-base sm:text-lg">{profile.school}</p>
                 )}
               </div>
             </div>
           </div>
 
           {/* Profile Content */}
-          <div className="p-8">
+          <div className="p-4 sm:p-8">
             {/* Monthly Need */}
-            <div className="mb-8 p-6 bg-blue-50 rounded-xl border-2 border-blue-100">
+            <div className="mb-6 sm:mb-8 p-4 sm:p-6 bg-blue-50 rounded-xl border-2 border-blue-100">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-blue-600 font-semibold mb-1">
+                  <p className="text-xs sm:text-sm text-blue-600 font-semibold mb-1">
                     Monthly Need
                   </p>
-                  <p className="text-3xl font-bold text-blue-900">
+                  <p className="text-2xl sm:text-3xl font-bold text-blue-900">
                     ₦{profile.monthly_need.toLocaleString()}
                   </p>
                 </div>
-                <div className="text-5xl">💰</div>
+                <div className="text-4xl sm:text-5xl">💰</div>
               </div>
             </div>
 
             {/* Story */}
-            <div className="mb-8">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">My Story</h2>
-              <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+            <div className="mb-6 sm:mb-8">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4">My Story</h2>
+              <p className="text-sm sm:text-base text-gray-700 whitespace-pre-wrap leading-relaxed">
                 {profile.story}
               </p>
             </div>
 
             {/* Share Profile */}
+            <div className="mb-6 sm:mb-8 p-4 sm:p-6 bg-green-50 rounded-xl border-2 border-green-200">
+              <h3 className="font-bold text-green-900 mb-2 sm:mb-3 text-base sm:text-lg">📤 Share Your Profile</h3>
+              <p className="text-xs sm:text-sm text-green-800 mb-3 sm:mb-4">
+                Share this link with potential sponsors (alumni, family, friends)
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-3">
+                <input
+                  type="text"
+                  value={`${typeof window !== 'undefined' ? window.location.origin : ''}/profile/${profileId}`}
+                  readOnly
+                  className="flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-white border-2 border-green-300 rounded-lg text-xs sm:text-sm"
+                />
+                <button
+                  onClick={handleShareProfile}
+                  className="px-4 sm:px-6 py-2 sm:py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors text-sm sm:text-base whitespace-nowrap"
+                >
+                  {copied ? '✓ Copied!' : 'Copy Link'}
+                </button>
+              </div>
 
-    <div className="mb-8 p-6 bg-green-50 rounded-xl border-2 border-green-200">
-      <h3 className="font-bold text-green-900 mb-3">📤 Share Your Profile</h3>
-      <p className="text-sm text-green-800 mb-4">
-        Share this link with potential sponsors (alumni, family, friends)
-      </p>
-      
-      <div className="flex gap-3">
-        <input
-          type="text"
-          value={`${typeof window !== 'undefined' ? window.location.origin : ''}/profile/${profileId}`}
-          readOnly
-          className="flex-1 px-4 py-3 bg-white border-2 border-green-300 rounded-lg text-sm"
-        />
-        <button
-          onClick={handleShareProfile}
-          className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors"
-        >
-          {copied ? '✓ Copied!' : 'Copy Link'}
-        </button>
-      </div>
-
-      <div className="mt-4 flex gap-3">
+      <div className="mt-4 flex flex-col sm:flex-row gap-3">
         <a
           href={`https://twitter.com/intent/tweet?text=Help me stay in school! ${window.location.href}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-lg"
+          className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-xs sm:text-sm rounded-lg text-center"
         >
           Share on Twitter
         </a>
@@ -261,7 +260,7 @@ export default function ProfilePage() {
           href={`https://wa.me/?text=Help me stay in school! ${window.location.href}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg"
+          className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-xs sm:text-sm rounded-lg text-center"
         >
           Share on WhatsApp
         </a>
@@ -270,31 +269,31 @@ export default function ProfilePage() {
   
 
             {/* Sponsor Buttons */}
-            <div className="border-t-2 border-gray-100 pt-8">
-              <h3 className="text-lg font-bold text-gray-800 mb-4">
+            <div className="border-t-2 border-gray-100 pt-6 sm:pt-8">
+              <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-4">
                 Support {profile.name.split(' ')[0]}'s Education
               </h3>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                 {/* Option 1 */}
                 <button
                   onClick={() => handleSubscribe(3000)}
                   disabled={subscribing}
-                  className="p-6 border-2 border-blue-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all disabled:opacity-50"
+                  className="p-4 sm:p-6 border-2 border-blue-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all disabled:opacity-50"
                 >
-                  <p className="text-2xl font-bold text-blue-600 mb-1">₦3,000</p>
-                  <p className="text-sm text-gray-600">per month</p>
+                  <p className="text-xl sm:text-2xl font-bold text-blue-600 mb-1">₦3,000</p>
+                  <p className="text-xs sm:text-sm text-gray-600">per month</p>
                 </button>
 
                 {/* Option 2 */}
                 <button
                   onClick={() => handleSubscribe(5000)}
                   disabled={subscribing}
-                  className="p-6 border-2 border-blue-500 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all disabled:opacity-50"
+                  className="p-4 sm:p-6 border-2 border-blue-500 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all disabled:opacity-50"
                 >
-                  <p className="text-2xl font-bold text-blue-600 mb-1">₦5,000</p>
-                  <p className="text-sm text-gray-600">per month</p>
-                  <span className="inline-block mt-2 px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full">
+                  <p className="text-xl sm:text-2xl font-bold text-blue-600 mb-1">₦5,000</p>
+                  <p className="text-xs sm:text-sm text-gray-600">per month</p>
+                  <span className="inline-block mt-2 px-2 sm:px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full">
                     POPULAR
                   </span>
                 </button>
@@ -303,14 +302,14 @@ export default function ProfilePage() {
                 <button
                   onClick={() => handleSubscribe(10000)}
                   disabled={subscribing}
-                  className="p-6 border-2 border-blue-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all disabled:opacity-50"
+                  className="p-4 sm:p-6 border-2 border-blue-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all disabled:opacity-50"
                 >
-                  <p className="text-2xl font-bold text-blue-600 mb-1">₦10,000</p>
-                  <p className="text-sm text-gray-600">per month</p>
+                  <p className="text-xl sm:text-2xl font-bold text-blue-600 mb-1">₦10,000</p>
+                  <p className="text-xs sm:text-sm text-gray-600">per month</p>
                 </button>
               </div>
 
-              <p className="text-sm text-gray-500 text-center mt-6">
+              <p className="text-xs sm:text-sm text-gray-500 text-center mt-4 sm:mt-6">
                 Auto-charged monthly for 3 months • Cancel anytime • Zero platform fees
               </p>
             </div>
@@ -318,13 +317,13 @@ export default function ProfilePage() {
         </div>
 
         {/* Info Box */}
-        <div className="mt-8 p-6 bg-white rounded-xl shadow-lg border-2 border-gray-100">
-          <h3 className="font-bold text-gray-800 mb-3">🔒 How it works:</h3>
-          <div className="space-y-2 text-sm text-gray-600">
-            <p> Subscribe once, auto-charged monthly (no popups!)</p>
-            <p> Money goes directly to student's wallet</p>
-            <p> Cancel anytime from your dashboard</p>
-            <p> Powered by Openfort session keys (gasless!)</p>
+        <div className="mt-6 sm:mt-8 p-4 sm:p-6 bg-white rounded-xl shadow-lg border-2 border-gray-100">
+          <h3 className="font-bold text-gray-800 mb-2 sm:mb-3 text-base sm:text-lg">🔒 How it works:</h3>
+          <div className="space-y-2 text-xs sm:text-sm text-gray-600">
+            <p>✓ Subscribe once, auto-charged monthly (no popups!)</p>
+            <p>✓ Money goes directly to student's wallet</p>
+            <p>✓ Cancel anytime from your dashboard</p>
+            <p>✓ Powered by Openfort session keys (gasless!)</p>
           </div>
         </div>
       </div>

@@ -203,40 +203,29 @@ useEffect(() => {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12 px-4">
+    <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-6 sm:py-12 px-4">
       <div className="max-w-2xl mx-auto">
 
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-end mb-3 sm:mb-4">
         <LogoutButton />
       </div>
 
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-blue-600 mb-2">
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold text-blue-600 mb-2">
             Create Your Profile
           </h1>
-          <p className="text-gray-600">
+          <p className="text-sm sm:text-base text-gray-600">
             Tell sponsors about yourself and your educational needs
           </p>
         </div>
 
-         
-        {/* <div className="mb-6 p-4 bg-blue-50 border-2 border-blue-200 rounded-lg">
-        <p className="text-sm text-blue-800">
-            📧 Logged in as: <strong>{user.email}</strong>
-        </p>
-        {!isValidStudentDomain(user.email as unknown as string) && (
-            <p className="text-sm text-red-600 mt-2">
-            <strong>This doesn't look like a student email. Please logout and sign in with your university email.</strong>
-            </p>
-        )}
-        </div> */}
         {/* Form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-8">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             {/* Name */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
                 Full Name *
               </label>
               <input
@@ -245,14 +234,14 @@ useEffect(() => {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-sm sm:text-base"
                 placeholder="e.g., Tunde Adebayo"
               />
             </div>
 
             {/* School */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
                 University / School
               </label>
               <input
@@ -260,14 +249,14 @@ useEffect(() => {
                 name="school"
                 value={formData.school}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-sm sm:text-base"
                 placeholder="e.g., OAU - Computer Science (Final Year)"
               />
             </div>
 
             {/* Story */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
                 Your Story *
               </label>
               <textarea
@@ -276,7 +265,7 @@ useEffect(() => {
                 onChange={handleChange}
                 required
                 rows={6}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none resize-none"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none resize-none text-sm sm:text-base"
                 placeholder="Tell sponsors about your situation, why you need support, and your academic goals..."
               />
               <p className="text-xs text-gray-500 mt-1">
@@ -286,7 +275,7 @@ useEffect(() => {
 
             {/* Monthly Need */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
                 Monthly Need (₦) *
               </label>
               <input
@@ -297,7 +286,7 @@ useEffect(() => {
                 required
                 min="1000"
                 step="1000"
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-sm sm:text-base"
                 placeholder="e.g., 15000"
               />
               <p className="text-xs text-gray-500 mt-1">
@@ -307,8 +296,8 @@ useEffect(() => {
 
             {/* Error Message */}
             {error && (
-              <div className="p-4 bg-red-50 border-2 border-red-200 rounded-lg">
-                <p className="text-red-600 text-sm">{error}</p>
+              <div className="p-3 sm:p-4 bg-red-50 border-2 border-red-200 rounded-lg">
+                <p className="text-red-600 text-xs sm:text-sm">{error}</p>
               </div>
             )}
 
@@ -316,7 +305,7 @@ useEffect(() => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed text-sm sm:text-base"
             >
               {loading ? 'Creating Profile...' : 'Create Profile'}
             </button>
@@ -324,9 +313,9 @@ useEffect(() => {
         </div>
 
         {/* Info Box */}
-        <div className="mt-8 p-6 bg-blue-50 rounded-lg border-2 border-blue-100">
-          <h3 className="font-bold text-blue-900 mb-2">💡 Tips for a great profile:</h3>
-          <ul className="text-sm text-blue-800 space-y-1">
+        <div className="mt-6 sm:mt-8 p-4 sm:p-6 bg-blue-50 rounded-lg border-2 border-blue-100">
+          <h3 className="font-bold text-blue-900 mb-2 text-sm sm:text-base">💡 Tips for a great profile:</h3>
+          <ul className="text-xs sm:text-sm text-blue-800 space-y-1">
             <li>• Be honest about your situation</li>
             <li>• Explain how support will help your education</li>
             <li>• Mention your academic goals and achievements</li>

@@ -32,11 +32,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <QueryClientProvider client={queryClient}>
         <OpenfortProvider
           // Your publishable key (safe for browser)
-          publishableKey={process.env.OPENFORT_PUBLISHABLE_KEY!}
+          publishableKey={process.env.NEXT_PUBLIC_OPENFORT_PUBLISHABLE_KEY!}
           
           // Wallet configuration
           walletConfig={{
-            shieldPublishableKey: process.env.SHIELD_PUBLISHABLE_KEY!,
+            shieldPublishableKey: process.env.NEXT_PUBLIC_SHIELD_PUBLISHABLE_KEY!,
             // Backend endpoint for wallet recovery
             createEncryptedSessionEndpoint: "/api/openfort/session",
           }}
