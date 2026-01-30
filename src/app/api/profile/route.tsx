@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '../../../lib/superbase';
+import { supabaseAdmin } from '../../../lib/supabase';
 
 // GET profile by user ID
 export async function GET(request: NextRequest) {

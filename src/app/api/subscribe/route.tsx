@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '../../../lib/superbase';
+import { supabaseAdmin } from '../../../lib/supabase';
 import { openfort } from '../../../lib/openforte';
 import { TransactionIntent, TransactionIntentResponse } from '@openfort/openfort-node';
 export async function POST(request: NextRequest) {

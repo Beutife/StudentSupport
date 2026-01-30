@@ -8,7 +8,7 @@ export async function POST() {
   try {
     // Create encryption session for wallet recovery
     const session = await openfort.createEncryptionSession(
-      process.env.NEXT_PUBLIC_SHIELD_PUBLISHABLE_KEY!,
+      process.env.SHIELD_PUBLISHABLE_KEY!,
       process.env.OPENFORT_SHIELD_SECRET_KEY!,
       process.env.OPENFORT_SHIELD_ENCRYPTION_SHARE!
     );
