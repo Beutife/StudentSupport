@@ -60,6 +60,27 @@ export default function Dashboard() {
     fetchSubscriptions();
   }, [user, router]);
 
+  const handleCancel = async (subscriptionId: string) => {
+    if (!confirm('Are you sure you want to cancel this subscription?')) {
+      return;
+    }
+    
+    try {
+      const response = await fetch(`/api/subscriptions/cancel`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subscriptionId }),
+      });
+      
+      if (!response.ok) throw new Error('Failed to cancel');
+      
+      alert('Subscription cancelled successfully');
+      window.location.reload(); // Refresh to show updated status
+    } catch (error) {
+      alert('Failed to cancel subscription');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -150,6 +171,13 @@ export default function Dashboard() {
               <p className="text-sm text-blue-800 mt-1">
                 given to {subscriptions.length} student{subscriptions.length !== 1 ? 's' : ''}
               </p>
+                <button
+                onClick={() => handleCancel(sub.id)}
+                className="mt-4 w-full px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-semibold transition-colors"
+                >
+                Cancel Subscription
+                </button>
+
             </div>
           </div>
         )}

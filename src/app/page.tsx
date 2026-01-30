@@ -32,6 +32,48 @@ export default function Home() {
       console.error('Error:', error);
     }
   };
+
+  useEffect(() => {
+    async function handleRedirect() {
+      if (!user) return;
+      
+      // Check if they came from a student profile link
+      const referredFrom = sessionStorage.getItem('studentProfileId');
+      if (referredFrom) {
+        router.push(`/profile/${referredFrom}`);
+        return;
+      }
+      
+      // Check if they're a student with a profile
+      const userResponse = await fetch(`/api/user?email=${user.email}`);
+      const { user: dbUser } = await userResponse.json();
+      
+      if (dbUser) {
+        const profileResponse = await fetch(`/api/profile?userId=${dbUser.id}`);
+        const { profile } = await profileResponse.json();
+        
+        if (profile) {
+          // Student with profile - show their profile
+          router.push(`/profile/${profile.id}`);
+        } else {
+          // New student - create profile
+          router.push('/create-profile');
+        }
+      } else {
+        // New user - check if student or sponsor
+        if (user.email.includes('@student.') || user.email.endsWith('.edu.ng')) {
+          // Looks like a student
+          router.push('/create-profile');
+        } else {
+          // Probably a sponsor - show browse page
+          router.push('/dashboard');
+        }
+      }
+    }
+    
+    handleRedirect();
+  }, [user, router]);
+
   // If user logged in, redirect to create profile
   useEffect(() => {
     async function checkUser() {
@@ -79,11 +121,7 @@ export default function Home() {
         
         {/* Login Button (from Openfort docs) */}
         <div className="mb-12 p-8 bg-white rounded-2xl shadow-xl">
-          <OpenfortButton
-            showAvatar={true}
-            showBalance={false}
-            label="Get Started"
-          />
+          
           <p className="text-sm text-gray-500 mt-4">
             Your wallet will be created automatically - no crypto knowledge needed
           </p>
@@ -114,6 +152,12 @@ export default function Home() {
               Session keys enable gasless recurring payments
             </p>
           </div>
+
+            <OpenfortButton
+              showAvatar={true}
+              showBalance={false}
+              label="Get Started"
+            />
         </div>
 
         {/* Footer */}

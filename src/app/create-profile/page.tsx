@@ -79,6 +79,36 @@ useEffect(() => {
     }
   }, [user, router]);
 
+  useEffect(() => {
+    async function checkIfSponsor() {
+      if (!user) return;
+      
+      // Check if user came from a student profile link
+      const referredFrom = sessionStorage.getItem('studentProfileId');
+      
+      if (referredFrom) {
+        // They're a sponsor - redirect to that student's profile
+        router.push(`/profile/${referredFrom}`);
+        return;
+      }
+      
+      // Check if they already have a profile (student)
+      const userResponse = await fetch(`/api/user?email=${user.email}`);
+      const { user: dbUser } = await userResponse.json();
+      
+      if (dbUser) {
+        const profileResponse = await fetch(`/api/profile?userId=${dbUser.id}`);
+        const { profile } = await profileResponse.json();
+        
+        if (profile) {
+          router.push(`/profile/${profile.id}`);
+        }
+      }
+    }
+    
+    checkIfSponsor();
+  }, [user, router]);
+
   // Handle form input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({

@@ -37,6 +37,12 @@ export default function ProfilePage() {
     }, 2000);
   }
 
+  useEffect(() => {
+    // Save this profile ID so we know sponsor came from here
+    sessionStorage.setItem('studentProfileId', profileId);
+  }, [profileId]);
+
+  
   // Fetch profile data
   useEffect(() => {
     async function fetchProfile() {
