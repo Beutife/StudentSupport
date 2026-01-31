@@ -64,25 +64,31 @@ export async function POST(request: NextRequest) {
     // Note: This might fail if the sponsor doesn't have an Openfort account yet
     // We'll handle this gracefully and still create the subscription
     let transactionIntentId: string | null = null;
-    try {
-      const transactionIntent = await openfort.transactionIntents.create({
-        player: sponsor_player_id,
-        chainId: 84532, // Base Sepolia
-        optimistic: true,
-        policy: process.env.OPENFORT_GAS_POLICY_ID,
-        interactions: [
-          {
-            contract: '0x036CbD53842c5426634e7929541eC2318f3dCF7e', // USDC on Base Sepolia
-            functionName: 'transfer',
-            functionArgs: [student_wallet, amount * 1000000], // USDC has 6 decimals
-          },
-        ],
-      });
-      transactionIntentId = transactionIntent.id;
-    } catch (txError: any) {
-      console.warn('Transaction intent creation failed:', txError);
-      // Continue without transaction intent - subscription can still be created
-      // The transaction can be created later when processing payments
+    
+    // Only try to create transaction intent if Openfort is properly configured
+    if (process.env.OPENFORT_SECRET_KEY && process.env.OPENFORT_GAS_POLICY_ID) {
+      try {
+        const transactionIntent = await openfort.transactionIntents.create({
+          player: sponsor_player_id,
+          chainId: 84532, // Base Sepolia
+          optimistic: true,
+          policy: process.env.OPENFORT_GAS_POLICY_ID,
+          interactions: [
+            {
+              contract: '0x036CbD53842c5426634e7929541eC2318f3dCF7e', // USDC on Base Sepolia
+              functionName: 'transfer',
+              functionArgs: [student_wallet, amount * 1000000], // USDC has 6 decimals
+            },
+          ],
+        });
+        transactionIntentId = transactionIntent.id;
+      } catch (txError: any) {
+        console.warn('Transaction intent creation failed:', txError);
+        // Continue without transaction intent - subscription can still be created
+        // The transaction can be created later when processing payments
+      }
+    } else {
+      console.warn('Openfort not fully configured - skipping transaction intent creation');
     }
 
 

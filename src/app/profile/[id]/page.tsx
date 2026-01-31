@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { useOpenfort } from '@openfort/react';
+import { useOpenfort, OpenfortButton } from '@openfort/react';
 import { useAccount } from 'wagmi'; 
 import { useRouter } from 'next/navigation';
 
@@ -66,7 +66,11 @@ export default function ProfilePage() {
   // Handle subscription (we'll implement this later with session keys)
   const handleSubscribe = async (amount: number) => {
     if (!user) {
-      alert('Please login first to sponsor this student');
+      // Store profile ID so we can redirect back after login
+      sessionStorage.setItem('studentProfileId', profileId);
+      sessionStorage.setItem('subscribeAmount', amount.toString());
+      // Redirect to home page to login
+      router.push('/');
       return;
     }
   
@@ -274,44 +278,65 @@ export default function ProfilePage() {
                 Support {profile.name.split(' ')[0]}'s Education
               </h3>
               
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                {/* Option 1 */}
-                <button
-                  onClick={() => handleSubscribe(3000)}
-                  disabled={subscribing}
-                  className="p-4 sm:p-6 border-2 border-blue-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all disabled:opacity-50"
-                >
-                  <p className="text-xl sm:text-2xl font-bold text-blue-600 mb-1">₦3,000</p>
-                  <p className="text-xs sm:text-sm text-gray-600">per month</p>
-                </button>
+              {!user ? (
+                // Show login prompt if not logged in
+                <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6 text-center">
+                  <p className="text-sm sm:text-base text-yellow-800 mb-4">
+                    Please login to subscribe and support this student
+                  </p>
+                  <div className="flex justify-center">
+                    <OpenfortButton
+                      showAvatar={false}
+                      showBalance={false}
+                      label="Login to Subscribe"
+                    />
+                  </div>
+                  <p className="text-xs text-yellow-700 mt-3">
+                    After logging in, you'll be redirected back here to complete your subscription
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                    {/* Option 1 */}
+                    <button
+                      onClick={() => handleSubscribe(3000)}
+                      disabled={subscribing}
+                      className="p-4 sm:p-6 border-2 border-blue-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all disabled:opacity-50"
+                    >
+                      <p className="text-xl sm:text-2xl font-bold text-blue-600 mb-1">₦3,000</p>
+                      <p className="text-xs sm:text-sm text-gray-600">per month</p>
+                    </button>
 
-                {/* Option 2 */}
-                <button
-                  onClick={() => handleSubscribe(5000)}
-                  disabled={subscribing}
-                  className="p-4 sm:p-6 border-2 border-blue-500 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all disabled:opacity-50"
-                >
-                  <p className="text-xl sm:text-2xl font-bold text-blue-600 mb-1">₦5,000</p>
-                  <p className="text-xs sm:text-sm text-gray-600">per month</p>
-                  <span className="inline-block mt-2 px-2 sm:px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full">
-                    POPULAR
-                  </span>
-                </button>
+                    {/* Option 2 */}
+                    <button
+                      onClick={() => handleSubscribe(5000)}
+                      disabled={subscribing}
+                      className="p-4 sm:p-6 border-2 border-blue-500 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all disabled:opacity-50"
+                    >
+                      <p className="text-xl sm:text-2xl font-bold text-blue-600 mb-1">₦5,000</p>
+                      <p className="text-xs sm:text-sm text-gray-600">per month</p>
+                      <span className="inline-block mt-2 px-2 sm:px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full">
+                        POPULAR
+                      </span>
+                    </button>
 
-                {/* Option 3 */}
-                <button
-                  onClick={() => handleSubscribe(10000)}
-                  disabled={subscribing}
-                  className="p-4 sm:p-6 border-2 border-blue-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all disabled:opacity-50"
-                >
-                  <p className="text-xl sm:text-2xl font-bold text-blue-600 mb-1">₦10,000</p>
-                  <p className="text-xs sm:text-sm text-gray-600">per month</p>
-                </button>
-              </div>
+                    {/* Option 3 */}
+                    <button
+                      onClick={() => handleSubscribe(10000)}
+                      disabled={subscribing}
+                      className="p-4 sm:p-6 border-2 border-blue-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all disabled:opacity-50"
+                    >
+                      <p className="text-xl sm:text-2xl font-bold text-blue-600 mb-1">₦10,000</p>
+                      <p className="text-xs sm:text-sm text-gray-600">per month</p>
+                    </button>
+                  </div>
 
-              <p className="text-xs sm:text-sm text-gray-500 text-center mt-4 sm:mt-6">
-                Auto-charged monthly for 3 months • Cancel anytime • Zero platform fees
-              </p>
+                  <p className="text-xs sm:text-sm text-gray-500 text-center mt-4 sm:mt-6">
+                    Auto-charged monthly for 3 months • Cancel anytime • Zero platform fees
+                  </p>
+                </>
+              )}
             </div>
           </div>
         </div>

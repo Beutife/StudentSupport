@@ -41,7 +41,10 @@ export default function Home() {
         // Check if they came from a student profile link (sponsor viewing a student profile)
         const referredFrom = sessionStorage.getItem('studentProfileId');
         if (referredFrom) {
-          sessionStorage.removeItem('studentProfileId'); // Clear it after use
+          // Redirect back to the profile page they were viewing
+          sessionStorage.removeItem('studentProfileId');
+          // Clear subscribe amount if it exists (will be handled on profile page)
+          sessionStorage.removeItem('subscribeAmount');
           router.push(`/profile/${referredFrom}`);
           return;
         }
