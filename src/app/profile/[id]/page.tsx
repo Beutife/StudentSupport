@@ -251,7 +251,7 @@ export default function ProfilePage() {
                 </button>
               </div>
 
-      <div className="mt-4 flex flex-col sm:flex-row gap-3">
+        <div className="mt-4 flex flex-col sm:flex-row gap-3">
         <a
           href={`https://twitter.com/intent/tweet?text=Help me stay in school! ${window.location.href}`}
           target="_blank"
@@ -268,11 +268,9 @@ export default function ProfilePage() {
         >
           Share on WhatsApp
         </a>
-      </div>
-    </div>
+        </div>
+        </div>
   
-
-            {/* Sponsor Buttons */}
             <div className="border-t-2 border-gray-100 pt-6 sm:pt-8">
               <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-4">
                 Support {profile.name.split(' ')[0]}'s Education
@@ -297,41 +295,6 @@ export default function ProfilePage() {
                 </div>
               ) : (
                 <>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                    {/* Option 1 */}
-                    <button
-                      onClick={() => handleSubscribe(3000)}
-                      disabled={subscribing}
-                      className="p-4 sm:p-6 border-2 border-blue-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all disabled:opacity-50"
-                    >
-                      <p className="text-xl sm:text-2xl font-bold text-blue-600 mb-1">₦3,000</p>
-                      <p className="text-xs sm:text-sm text-gray-600">per month</p>
-                    </button>
-
-                    {/* Option 2 */}
-                    <button
-                      onClick={() => handleSubscribe(5000)}
-                      disabled={subscribing}
-                      className="p-4 sm:p-6 border-2 border-blue-500 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all disabled:opacity-50"
-                    >
-                      <p className="text-xl sm:text-2xl font-bold text-blue-600 mb-1">₦5,000</p>
-                      <p className="text-xs sm:text-sm text-gray-600">per month</p>
-                      <span className="inline-block mt-2 px-2 sm:px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full">
-                        POPULAR
-                      </span>
-                    </button>
-
-                    {/* Option 3 */}
-                    <button
-                      onClick={() => handleSubscribe(10000)}
-                      disabled={subscribing}
-                      className="p-4 sm:p-6 border-2 border-blue-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all disabled:opacity-50"
-                    >
-                      <p className="text-xl sm:text-2xl font-bold text-blue-600 mb-1">₦10,000</p>
-                      <p className="text-xs sm:text-sm text-gray-600">per month</p>
-                    </button>
-                  </div>
-
                   <p className="text-xs sm:text-sm text-gray-500 text-center mt-4 sm:mt-6">
                     Auto-charged monthly for 3 months • Cancel anytime • Zero platform fees
                   </p>
@@ -343,7 +306,7 @@ export default function ProfilePage() {
 
         {/* Info Box */}
         <div className="mt-6 sm:mt-8 p-4 sm:p-6 bg-white rounded-xl shadow-lg border-2 border-gray-100">
-          <h3 className="font-bold text-gray-800 mb-2 sm:mb-3 text-base sm:text-lg">🔒 How it works:</h3>
+          <h3 className="font-bold text-gray-800 mb-2 sm:mb-3 text-base sm:text-lg"> How it works:</h3>
           <div className="space-y-2 text-xs sm:text-sm text-gray-600">
             <p>✓ Subscribe once, auto-charged monthly (no popups!)</p>
             <p>✓ Money goes directly to student's wallet</p>

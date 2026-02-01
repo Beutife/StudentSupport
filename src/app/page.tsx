@@ -109,8 +109,8 @@ export default function Home() {
         </p>
         
         {/* Login Button (from Openfort docs) */}
-        <div className="mb-8 sm:mb-12 p-6 sm:p-8 bg-white rounded-2xl shadow-xl">
-          <OpenfortButton
+        <div className="mb-8 sm:mb-12 p-6 sm:p-8 bg-white rounded-2xl shadow-xl me-4">
+        <OpenfortButton
             showAvatar={true}
             showBalance={false}
             label="Get Started"
