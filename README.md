@@ -2,7 +2,7 @@
 
 **Help Nigerian students stay in school through transparent crypto subscriptions**
 
-[![Live Demo](https://img.shields.io/badge/demo-live-success)](https://student-support-5scx.vercel.app/)
+[![Live Demo](https://youtu.be/oV-rdl5GcaQ?si=woo4QDEEGMa_GF6b)](https://student-support-5scx.vercel.app/)
 [![Built with Openfort](https://img.shields.io/badge/built%20with-Openfort-blue)](https://openfort.io)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
